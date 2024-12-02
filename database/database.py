@@ -6,6 +6,7 @@ import configparser
 from sqlalchemy import (
     create_engine, MetaData, Table, Column, Integer, String, Date, ForeignKey, Float
 )
+from db_password import DATABASE_URL
 
 Base = declarative_base()
 
@@ -56,12 +57,11 @@ def get_session():
     return session
 
 def get_connection(db_config):
-    url = "postgresql+psycopg2://postgres:password@localhost:5432/film_db"
-    return create_engine(url, echo=True, future=True)
+    return create_engine(DATABASE_URL, echo=True, future=True)
 
 def add_user(username, hashed_password):
     print("step 1")
-    engine = create_engine("postgresql+psycopg2://postgres:password@localhost:5432/film_db", echo=True, future=True)
+    engine = create_engine(DATABASE_URL, echo=True, future=True)
     print("step 2")
     stmt = insert(users_table).values(username=username, hash_password=hashed_password)
     print(stmt)
