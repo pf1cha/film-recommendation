@@ -6,36 +6,10 @@ import configparser
 from sqlalchemy import (
     create_engine, MetaData, Table, Column, Integer, String, Date, ForeignKey, Float
 )
-from db_password import DATABASE_URL
+from database.db_password import DATABASE_URL
+from database.database_info import users_table
 
 Base = declarative_base()
-
-metadata = MetaData()
-# Define Users table
-users_table = Table(
-    "users", metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("username", String(50), nullable=False, unique=True),
-    Column("hash_password", String(128), nullable=False)
-)
-
-# Define Content table
-content_table = Table(
-    "content", metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("name", String(100), nullable=False),
-    Column("release_date", Date, nullable=False),
-    Column("genre", String(50), nullable=False)
-)
-
-# Define UserInterests table
-user_interests_table = Table(
-    "user_interests", metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("user_id", Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
-    Column("content_id", Integer, ForeignKey("content.id", ondelete="CASCADE"), nullable=False),
-    Column("score", Float, nullable=False)  # User's rating/score for the content
-)
 
 def load_config():
     config = configparser.ConfigParser()
@@ -60,11 +34,8 @@ def get_connection(db_config):
     return create_engine(DATABASE_URL, echo=True, future=True)
 
 def add_user(username, hashed_password):
-    print("step 1")
     engine = create_engine(DATABASE_URL, echo=True, future=True)
-    print("step 2")
     stmt = insert(users_table).values(username=username, hash_password=hashed_password)
-    print(stmt)
     try:
         with engine.connect() as conn:
             conn.execute(stmt)
