@@ -1,12 +1,7 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
-from scipy.stats import pearsonr
 
-plt.style.use('ggplot')
-pd.set_option('display.max_columns', 300)
 
+pd.set_option('display.max_columns', None)
 
 def parse_recommended_films(recommended_films):
     recommended_films = recommended_films.replace('-', ', ')
@@ -67,20 +62,14 @@ def merge_the_same_columns(merged_df):
     return merged_df
 
 if __name__ == '__main__':
-    # films_1 = pd.read_csv('data/film_database.csv')
-    # films_1 = films_1[["id", "title", "vote_average", "vote_count",
-    #                    "budget", "popularity", "release_year", "Writer", "Director", "genres_list"]]
-    # films_1.dropna(inplace=True)
-    # films_1["release_year"] = films_1["release_year"].astype(np.int64)
-    # films_1 = films_1[films_1["vote_count"] >= 10]
     # https://www.kaggle.com/datasets/akshaypawar7/millions-of-movies
-    films_2 = pd.read_csv('data/movies.csv')
+    films_2 = pd.read_csv('../data/movies.csv')
     films_2 = films_2[films_2["vote_count"] >= 10]
     films_2 = films_2.drop(["overview", "status", "tagline",
                             "credits", "keywords", "poster_path",
                             "backdrop_path"], axis=1)
     # https://www.kaggle.com/datasets/asaniczka/tmdb-movies-dataset-2023-930k-movies/data
-    films_3 = pd.read_csv('data/tmdb_movies.csv')
+    films_3 = pd.read_csv('../data/tmdb_movies.csv')
     films_3 = films_3[films_3["vote_count"] >= 10]
     films_3 = films_3.drop(["id", "status", "adult", "backdrop_path",
                             "homepage", "imdb_id", "original_title",
@@ -95,23 +84,14 @@ if __name__ == '__main__':
 
     merged_films = pd.merge(films_2, films_3, on='title', suffixes=('_df1', '_df2'))
     merged_films = merge_the_same_columns(merged_films)
-    #
-    # draft = pd.concat(g for _, g in merged_films.groupby('title') if len(g) > 1)
-    # print(draft[['title', 'id']].head(10))
 
     merged_films = merged_films.drop_duplicates(subset=['title'], keep='first')
-    # merged_films.to_csv('data/films_merged.csv', index=True, header=True)
-    # merged_films['recommendations'] = merged_films.apply(
-    #     lambda row: parse_recommended_films(row['recommendations']), axis=1)
-    # print(merged_films.head())
-    # # Data Normalization
-
-    # Binning (for instance with price and runtime)
-    # bins = np.linspace(min(merged_films['budget']), max(merged_films['budget']), 3)
-    # group_names = ["Low", "Medium", "High"]
-    # merged_films['budget'] = pd.cut(merged_films['budget'], bins=bins, labels=group_names, include_lowest=True)
-    # Make a histogram
-
+    merged_films = merged_films.drop(['popularity', 'production_companies', 'recommendations'], axis=1)
+    print(str(merged_films.head()))
     # Turning categorical variables into quantitative variables
     # merged_films = pd.get_dummies(merged_films)
     # print(merged_films.shape)
+
+    # Make a histogram
+
+    # id,title,recommendations,popularity,vote_average,vote_count,genres,release_date,revenue,runtime,budget,original_language,production_companies
