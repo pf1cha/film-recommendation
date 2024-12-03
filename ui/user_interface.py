@@ -4,9 +4,8 @@ from PyQt6.QtWidgets import (
     QPushButton, QVBoxLayout,
     QWidget
 )
-from PyQt6.QtCore import Qt
-from windows.registration import RegistrationWindow
-from windows.login import LoginWindow
+from ui.windows.registration import RegistrationWindow
+from ui.windows.login import LoginWindow
 
 class MainWindow(QMainWindow):
     def __init__(self):
