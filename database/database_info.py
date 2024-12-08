@@ -19,12 +19,12 @@ content_table = Table(
     Column("name", String(100), nullable=False),
     Column("release_date", Date, nullable=False),
     Column("genre", String(50), nullable=False),
-    # Column("revenue", Float),  # Newly added
-    # Column("runtime", Float),  # Newly added
-    # Column("vote_average", Float),  # Newly added
-    # Column("vote_count", Integer),  # Newly added
-    # Column("budget", Float),  # Newly added
-    # Column("original_language", String(10))  # Newly added
+    Column("revenue", Float),  # Newly added
+    Column("runtime", Float),  # Newly added
+    Column("vote_average", Float),  # Newly added
+    Column("vote_count", Integer),  # Newly added
+    Column("budget", Float),  # Newly added
+    Column("original_language", String(10))  # Newly added
 )
 
 # Define UserInterests table

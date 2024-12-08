@@ -15,10 +15,4 @@ merged_films['genres'] = merged_films['genres'].apply(lambda x: ', '.join(set(x.
 # Split the genres into individual entries
 all_genres = merged_films['genres'].str.split(', ')
 
-# Flatten the list of genres
-flattened_genres = [genre for sublist in all_genres for genre in sublist]
-
-# Count the occurrences of each genre
-genre_counts = pd.Series(flattened_genres).value_counts()
-
 print(merged_films.info())
