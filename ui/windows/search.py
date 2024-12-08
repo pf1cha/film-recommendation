@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, select, desc
 from sqlalchemy.orm import sessionmaker
 from database.database_info import content_table
 from database.db_password import DATABASE_URL
-from database.database import fetch_movies
+from database.database import fetch_movies, fetch_movies_by_title
 
 
 class SearchRecommendationWindow(QWidget):
@@ -76,25 +76,22 @@ class SearchRecommendationWindow(QWidget):
         self.tableWidget.resizeColumnsToContents()
 
     def search_film(self):
-        """Search for films by title."""
+        """Search for films by title and display all matching results."""
         film_name = self.search_input.text()
         if not film_name:
             QMessageBox.warning(self, "Error", "Please enter a film name.")
             return
 
-        # Reset the table and offset
-        self.table_widget.setRowCount(0)
+        # Reset the table for the new search
+        self.tableWidget.setRowCount(0)
         self.offset = 0
 
-        # Query the database for matching films
-        engine = create_engine(DATABASE_URL, echo=True, future=True)
-        session = sessionmaker(bind=engine)()
-        try:
-            query = select(content_table).where(content_table.c.title.ilike(f"%{film_name}%")).limit(self.limit)
-            results = session.execute(query).fetchall()
+        # Fetch matching movies using the standalone function
+        results = fetch_movies_by_title(film_name)
+        if results:
             self.display_results(results)
-        finally:
-            session.close()
+        else:
+            QMessageBox.information(self, "No Results", "No films found matching your search.")
 
     def get_recommendation(self):
         QMessageBox.information(self, "Recommendation", "Recommended Film: Inception")
