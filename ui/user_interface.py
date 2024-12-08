@@ -11,7 +11,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Welcome")
-        self.setGeometry(300, 300, 300, 200)
+        self.setGeometry(500, 500, 300, 200)
         self.init_ui()
 
     def init_ui(self):
