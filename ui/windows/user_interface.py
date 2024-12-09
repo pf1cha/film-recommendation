@@ -10,6 +10,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Welcome")
         self.setGeometry(100, 100, 300, 200)
         self.init_ui()
+        self.username = None
+        self.user_id = None
 
     def init_ui(self):
         # Create QStackedLayout for switching between views
@@ -45,15 +47,17 @@ class MainWindow(QMainWindow):
         """Switch back to the main welcome page after successful registration"""
         self.layout.setCurrentWidget(self.main_page)
 
+    def on_login_complete(self, username, user_id):
+        """Handle the successful login and switch to the main content view"""
+        self.username = username
+        self.user_id = user_id
+        self.show_search_recommendation_view()
+
     def open_login(self):
         """Handle the Login Window"""
         self.login_window = LoginWindow(self.on_login_complete, self.on_registration_complete)
         self.layout.addWidget(self.login_window)
         self.layout.setCurrentWidget(self.login_window)
-
-    def on_login_complete(self):
-        """Handle the successful login and switch to the main content view"""
-        self.show_search_recommendation_view()
 
     def show_search_recommendation_view(self):
         """Show the search and recommendation view after login"""
@@ -63,7 +67,7 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.search_recommendation_window)
         # Switch to the search/recommendation view
         self.layout.setCurrentWidget(self.search_recommendation_window)
-        self.setWindowTitle("Search and Recommendation")
+        self.setWindowTitle(f"Welcome, {self.username}")
         self.resize(1000, 500)
 
     def on_logout(self):
