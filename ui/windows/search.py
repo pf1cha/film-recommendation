@@ -1,18 +1,46 @@
 from PyQt6.QtWidgets import (
-    QPushButton, QLabel, QLineEdit, QVBoxLayout, QTableWidget, QTableWidgetItem,
-    QWidget, QMessageBox
+    QPushButton, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
+    QWidget, QMessageBox, QGroupBox, QFrame
 )
-from PyQt6.QtCore import QSize
+from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtGui import QColor, QPalette
 from database.database import fetch_movies, fetch_movies_by_title
 
 
 class SearchRecommendationWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Search and Recommendation")
-        self.resize(QSize(1000, 500))
-        # self.setGeometry(100, 100, 1000, 500)
-        # Pagination variables
+        self.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QLineEdit {
+                padding: 10px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+            }
+            QTableWidget {
+                border: 1px solid #ccc;
+                gridline-color: #e0e0e0;
+                background-color: #f9f9f9;
+                color: black;  # Set text color to black
+            }
+            QTableWidget::item {
+                padding: 8px;
+            }
+            QTableWidget::item:hover {
+                background-color: #f0f0f0;
+            }
+            QLabel {
+                font-size: 14px;
+            }
+        """)
         self.offset = 0
         self.limit = 10
         self.init_ui()
@@ -20,20 +48,35 @@ class SearchRecommendationWindow(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
 
-        # Search section components
-        self.search_label = QLabel("Search for a film:")
+        # Search section
+        search_group = QGroupBox("Search Movies")
+        search_layout = QVBoxLayout()
+        self.search_label = QLabel("Enter movie title:")
         self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search for a movie...")
 
         self.search_button = QPushButton("Search")
         self.search_button.clicked.connect(self.search_film)
 
-        # Recommendation section components
+        # Layout for search section
+        search_layout.addWidget(self.search_label)
+        search_layout.addWidget(self.search_input)
+        search_layout.addWidget(self.search_button)
+        search_group.setLayout(search_layout)
+
+        # Recommendation section
+        recommend_group = QGroupBox("Movie Recommendations")
+        recommend_layout = QVBoxLayout()
         self.recommend_button = QPushButton("Get Recommendation")
         self.recommend_button.clicked.connect(self.get_recommendation)
 
-        # Top movies section
         self.top_recommend_button = QPushButton("Top 10 Popular Movies")
         self.top_recommend_button.clicked.connect(self.show_top_recommendations)
+
+        # Layout for recommendations section
+        recommend_layout.addWidget(self.recommend_button)
+        recommend_layout.addWidget(self.top_recommend_button)
+        recommend_group.setLayout(recommend_layout)
 
         # Table setup
         self.tableWidget = QTableWidget()
@@ -41,16 +84,16 @@ class SearchRecommendationWindow(QWidget):
         self.tableWidget.setHorizontalHeaderLabels([
             'ID', 'Title', 'Release Date', 'Genre', 'Revenue', 'Budget', 'Rating', 'Votes', 'Profit', 'Language'
         ])
+        # self.tableWidget.setEditTriggers(QTableWidget.EditTriggers.NoEditTriggers)  # Disable editing in table
+        # self.tableWidget.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)  # Single row selection
 
         self.show_more_button = QPushButton("Show More")
         self.show_more_button.clicked.connect(self.show_more)
+        self.show_more_button.setEnabled(True)
 
-        # Add all widgets to the layout
-        layout.addWidget(self.search_label)
-        layout.addWidget(self.search_input)
-        layout.addWidget(self.search_button)
-        layout.addWidget(self.recommend_button)
-        layout.addWidget(self.top_recommend_button)  # Added button for Top Movies
+        # Add widgets to layout
+        layout.addWidget(search_group)
+        layout.addWidget(recommend_group)
         layout.addWidget(self.tableWidget)
         layout.addWidget(self.show_more_button)
 
@@ -104,6 +147,7 @@ class SearchRecommendationWindow(QWidget):
         """Show more movies when the user clicks 'Show More'."""
         movies = fetch_movies(offset=self.offset, limit=self.limit)
         if not movies:
+            self.show_more_button.setEnabled(False)
             QMessageBox.information(self, "No More Movies", "No more movies available.")
             return
         self.display_results(movies)
@@ -126,4 +170,3 @@ class SearchRecommendationWindow(QWidget):
             self.display_results(movies)
         else:
             QMessageBox.information(self, "No Recommendations", "No recommendations found.")
-

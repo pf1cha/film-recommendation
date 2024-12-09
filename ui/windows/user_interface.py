@@ -63,4 +63,5 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.search_recommendation_window)
         # Switch to the search/recommendation view
         self.layout.setCurrentWidget(self.search_recommendation_window)
+        self.setWindowTitle("Search and Recommendation")
         self.resize(1000, 500)
