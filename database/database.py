@@ -1,5 +1,5 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+
+from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.exc import IntegrityError
 import configparser
 from sqlalchemy import (
@@ -7,7 +7,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Session
 from database.db_password import DATABASE_URL
-from database.database_info import users_table, content_table, user_interests_table
+from database_info import users_table, content_table, user_interests_table
 from utils.utils import hash_password
 
 Base = declarative_base()
