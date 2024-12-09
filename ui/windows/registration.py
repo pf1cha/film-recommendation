@@ -3,11 +3,7 @@ from PyQt6.QtWidgets import (
     QWidget, QMessageBox
 )
 from database.database import add_user
-import hashlib
-
-def hash_password(password):
-    """Hash the password using SHA-256."""
-    return hashlib.sha256(password.encode()).hexdigest()
+from utils.utils import hash_password
 
 class RegistrationWindow(QWidget):
     def __init__(self, on_complete_callback):

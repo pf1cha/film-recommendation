@@ -9,8 +9,9 @@ from model.functions import recommend_movies_with_model
 
 
 class SearchRecommendationWindow(QWidget):
-    def __init__(self):
+    def __init__(self, on_logout_callback):
         super().__init__()
+        self.on_logout_callback = on_logout_callback
         self.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
@@ -60,9 +61,18 @@ class SearchRecommendationWindow(QWidget):
         self.top_movies_button = QPushButton("Top Movies By Ratings")
         self.top_movies_button.clicked.connect(self.show_top_movies_ui)
 
+
+        self.make_review = QPushButton("Review")
+        # self.make_review.clicked.connect(self.review)
+
+        self.log_out_button = QPushButton("Log Out")
+        self.log_out_button.clicked.connect(self.log_out)
+
         self.button_layout.addWidget(self.search_button)
         self.button_layout.addWidget(self.recommend_button)
         self.button_layout.addWidget(self.top_movies_button)
+        self.button_layout.addWidget(self.make_review)
+        self.button_layout.addWidget(self.log_out_button)
 
         # Stacked widget to switch between the different UIs
         self.stacked_widget = QStackedWidget()
@@ -92,6 +102,19 @@ class SearchRecommendationWindow(QWidget):
         ])
         layout.addWidget(self.tableWidget)
         self.setLayout(layout)
+
+    def log_out(self):
+        """Handle user log out."""
+        # Show confirmation dialog before logging out
+        reply = QMessageBox.question(
+            self, 'Log Out', 'Are you sure you want to log out?',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            QMessageBox.information(self, "Logged Out", "You have successfully logged out.")
+            self.on_logout_callback()
 
     def create_search_ui(self):
         search_group = QGroupBox("Search Movies")
