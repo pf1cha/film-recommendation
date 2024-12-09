@@ -4,7 +4,9 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QColor, QPalette
-from database.database import fetch_movies, fetch_movies_by_title
+from database.database import fetch_movies, fetch_movies_by_title, fetch_films_by_ids, get_film_id_by_name
+from model.functions import recommend_movies_with_model
+
 
 class SearchRecommendationWindow(QWidget):
     def __init__(self):
@@ -180,15 +182,31 @@ class SearchRecommendationWindow(QWidget):
             QMessageBox.information(self, "No Results", "No films found matching your search.")
 
     def get_recommendation(self):
-        """Fetch movie recommendations."""
+        """Fetch movie recommendations based on the input title or ID."""
         film_name_or_id = self.recommend_input.text()
         if not film_name_or_id:
             QMessageBox.warning(self, "Error", "Please enter a movie name or ID.")
             return
+        film_id = None
+        try:
+            film_id = int(film_name_or_id)
+        except ValueError:
+            film_id = get_film_id_by_name(film_name_or_id)
+        # Get recommendations using the model
+        recommendation = recommend_movies_with_model(film_id).tolist()
+        # Debugging output to check the recommendation
+        # Check if the recommendation is a valid list of movie IDs
+        # Fetch movies by the list of recommended IDs
+        movies = fetch_films_by_ids(recommendation)
+        # Check if we received valid movie data
+        if not movies:
+            QMessageBox.information(self, "No Recommendations", "No movies found for the given recommendations.")
+            return
 
-        # Placeholder for your recommendation logic
+        # Display the recommended movies
+        self.show_recommendations(movies)
+        # Optionally, inform the user that recommendations have been displayed
         QMessageBox.information(self, "Recommendation", "Recommended Films based on your query.")
-        self.show_recommendations()
 
     def show_more(self):
         """Show more movies when the user clicks 'Show More'."""
@@ -208,9 +226,8 @@ class SearchRecommendationWindow(QWidget):
         else:
             QMessageBox.information(self, "No More Movies", "No more movies available.")
 
-    def show_recommendations(self):
+    def show_recommendations(self, movies):
         """Fetch and display recommended movies."""
-        movies = fetch_movies(offset=self.offset, limit=self.limit)
         if movies:
             self.tableWidget.setRowCount(0)
             self.display_results(movies)
