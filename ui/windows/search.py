@@ -2,10 +2,6 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QLineEdit, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QWidget, QMessageBox
 )
-from sqlalchemy import create_engine, select, desc
-from sqlalchemy.orm import sessionmaker
-from database.database_info import content_table
-from database.db_password import DATABASE_URL
 from database.database import fetch_movies, fetch_movies_by_title
 
 
@@ -13,7 +9,7 @@ class SearchRecommendationWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Search and Recommendation")
-        self.setGeometry(100, 100, 1000, 400)
+        self.setGeometry(100, 100, 1000, 500)  # Adjust window size
         # Pagination variables
         self.offset = 0
         self.limit = 10
@@ -22,22 +18,24 @@ class SearchRecommendationWindow(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
 
+        # Search section components
         self.search_label = QLabel("Search for a film:")
         self.search_input = QLineEdit()
 
         self.search_button = QPushButton("Search")
         self.search_button.clicked.connect(self.search_film)
 
+        # Recommendation section components
         self.recommend_button = QPushButton("Get Recommendation")
         self.recommend_button.clicked.connect(self.get_recommendation)
 
+        # Top movies section
+        self.top_recommend_button = QPushButton("Top 10 Popular Movies")
+        self.top_recommend_button.clicked.connect(self.show_top_recommendations)
+
         # Table setup
         self.tableWidget = QTableWidget()
-        # Setting up the table with headers
-        # self.tableWidget.setRowCount(10)  # Set row count based on the number of entries
         self.tableWidget.setColumnCount(10)  # Number of columns in the data
-
-        # Set the column headers
         self.tableWidget.setHorizontalHeaderLabels([
             'ID', 'Title', 'Release Date', 'Genre', 'Revenue', 'Budget', 'Rating', 'Votes', 'Profit', 'Language'
         ])
@@ -45,23 +43,24 @@ class SearchRecommendationWindow(QWidget):
         self.show_more_button = QPushButton("Show More")
         self.show_more_button.clicked.connect(self.show_more)
 
+        # Add all widgets to the layout
         layout.addWidget(self.search_label)
         layout.addWidget(self.search_input)
         layout.addWidget(self.search_button)
         layout.addWidget(self.recommend_button)
+        layout.addWidget(self.top_recommend_button)  # Added button for Top Movies
         layout.addWidget(self.tableWidget)
         layout.addWidget(self.show_more_button)
 
         self.setLayout(layout)
 
-        # Load initial data
+        # Load initial data (e.g., fetch top movies)
         self.load_movies()
 
     def load_movies(self):
         """Load movies from the database and display them in the table."""
         movies = fetch_movies(offset=self.offset, limit=self.limit)
         self.display_results(movies)
-        # Increment the offset for pagination
 
     def display_results(self, movies):
         """Display a list of movies in the table widget."""
@@ -86,7 +85,6 @@ class SearchRecommendationWindow(QWidget):
         self.tableWidget.setRowCount(0)
         self.offset = 0
 
-        # Fetch matching movies using the standalone function
         results = fetch_movies_by_title(film_name)
         if results:
             self.display_results(results)
@@ -94,13 +92,36 @@ class SearchRecommendationWindow(QWidget):
             QMessageBox.information(self, "No Results", "No films found matching your search.")
 
     def get_recommendation(self):
+        """Display a generic recommendation (replace with your logic)."""
+        # Placeholder: this would be replaced with an actual recommendation logic
         QMessageBox.information(self, "Recommendation", "Recommended Film: Inception")
+        # You can replace this with a call to your database to fetch personalized recommendations.
+        self.show_recommendations()
 
     def show_more(self):
+        """Show more movies when the user clicks 'Show More'."""
         movies = fetch_movies(offset=self.offset, limit=self.limit)
-        # If there are no more movies, show a message
         if not movies:
             QMessageBox.information(self, "No More Movies", "No more movies available.")
             return
         self.display_results(movies)
+
+    def show_top_recommendations(self):
+        """Fetch and display the top 10 most popular movies."""
+        movies = fetch_movies(offset=self.offset, limit=10)  # Fetch the top 10 movies
+        if movies:
+            self.tableWidget.setRowCount(0)  # Clear the table before loading new data
+            self.display_results(movies)
+        else:
+            QMessageBox.information(self, "No More Movies", "No more movies available.")
+
+    def show_recommendations(self):
+        """Fetch and display recommended movies (this can be replaced with a real recommendation engine)."""
+        # Placeholder: Replace this with your actual recommendation fetching logic
+        movies = fetch_movies(offset=self.offset, limit=self.limit)
+        if movies:
+            self.tableWidget.setRowCount(0)  # Clear the table before loading new data
+            self.display_results(movies)
+        else:
+            QMessageBox.information(self, "No Recommendations", "No recommendations found.")
 
