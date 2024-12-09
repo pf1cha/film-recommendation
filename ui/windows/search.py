@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (
     QWidget, QMessageBox, QGroupBox, QStackedWidget, QInputDialog, QDoubleSpinBox
 )
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QColor, QPalette
+from PyQt6.QtGui import QScreen
 from database.database import (fetch_movies, fetch_movies_by_title,
                                fetch_films_by_ids, get_film_id_by_name, add_or_update_user_rating, fetch_user_reviews)
 from model.functions import recommend_movies_with_model
@@ -48,6 +48,13 @@ class SearchRecommendationWindow(QWidget):
         self.offset = 0
         self.limit = 10
         self.init_ui()
+
+    def center_window(self):
+        screen = self.screen()
+        screen_geometry = screen.geometry()
+        window_geometry = self.frameGeometry()
+        window_geometry.moveCenter(screen_geometry.center())
+        self.move(window_geometry.topLeft())
 
     def init_ui(self):
         layout = QVBoxLayout()
@@ -107,7 +114,7 @@ class SearchRecommendationWindow(QWidget):
         ])
         layout.addWidget(self.tableWidget)
         self.setLayout(layout)
-
+        self.center_window()
 
     def create_review_ui(self):
         """Create the UI for reviewing a movie."""
@@ -118,11 +125,11 @@ class SearchRecommendationWindow(QWidget):
         self.review_input = QLineEdit()
         self.review_input.setPlaceholderText("Enter movie title...")
 
-        self.rating_label = QLabel("Enter your rating (1.0 - 5.0):")
+        self.rating_label = QLabel("Enter your rating (1.0 - 10.0):")
         self.rating_input = QDoubleSpinBox()
-        self.rating_input.setRange(1.0, 5.0)
+        self.rating_input.setRange(1.0, 10.0)
         self.rating_input.setSingleStep(0.1)
-        self.rating_input.setValue(3.0)
+        self.rating_input.setValue(5.0)
 
         self.submit_review_button = QPushButton("Review a Film")
         self.submit_review_button.clicked.connect(self.submit_review)
@@ -179,7 +186,6 @@ class SearchRecommendationWindow(QWidget):
         QMessageBox.information(self, "Review Status", status)
         # Reload user reviews to show the new review
         self.load_user_reviews()
-
 
     def log_out(self):
         """Handle user log out."""

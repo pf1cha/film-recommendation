@@ -51,6 +51,7 @@ class MainWindow(QMainWindow):
         # Add the welcome page to the stacked layout
         self.layout.addWidget(self.main_page)
 
+
     def open_registration(self):
         """Handle the Registration Window"""
         self.registration_window = RegistrationWindow(self.on_registration_complete)
