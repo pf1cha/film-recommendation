@@ -159,3 +159,17 @@ def get_film_id_by_name(film_name):
     finally:
         session.close()
 
+def fetch_user_reviews(user_id):
+    """Fetch the reviews of a user from the database."""
+    engine = create_engine(DATABASE_URL)
+    session = Session(bind=engine)
+    try:
+        # Query the database to find the reviews of the user
+        query = select(user_interests_table).where(user_interests_table.c.user_id == user_id)
+        result = session.execute(query).fetchall()
+        return result
+    except Exception as e:
+        session.close()
+        raise e
+    finally:
+        session.close()

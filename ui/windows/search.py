@@ -1,17 +1,19 @@
 from PyQt6.QtWidgets import (
     QPushButton, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
-    QWidget, QMessageBox, QGroupBox, QStackedWidget
+    QWidget, QMessageBox, QGroupBox, QStackedWidget, QInputDialog, QDoubleSpinBox
 )
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QColor, QPalette
-from database.database import fetch_movies, fetch_movies_by_title, fetch_films_by_ids, get_film_id_by_name
+from database.database import (fetch_movies, fetch_movies_by_title,
+                               fetch_films_by_ids, get_film_id_by_name, add_or_update_user_rating, fetch_user_reviews)
 from model.functions import recommend_movies_with_model
 
 
 class SearchRecommendationWindow(QWidget):
-    def __init__(self, on_logout_callback):
+    def __init__(self, on_logout_callback, user_id):
         super().__init__()
         self.on_logout_callback = on_logout_callback
+        self.user_id = user_id
         self.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
@@ -61,9 +63,8 @@ class SearchRecommendationWindow(QWidget):
         self.top_movies_button = QPushButton("Top Movies By Ratings")
         self.top_movies_button.clicked.connect(self.show_top_movies_ui)
 
-
         self.make_review = QPushButton("Review")
-        # self.make_review.clicked.connect(self.review)
+        self.make_review.clicked.connect(self.show_review_ui)
 
         self.log_out_button = QPushButton("Log Out")
         self.log_out_button.clicked.connect(self.log_out)
@@ -90,6 +91,10 @@ class SearchRecommendationWindow(QWidget):
         self.top_movies_ui = self.create_top_movies_ui()
         self.stacked_widget.addWidget(self.top_movies_ui)
 
+        # Create Review UI
+        self.review_ui = self.create_review_ui()
+        self.stacked_widget.addWidget(self.review_ui)
+
         # Layout to hold button layout and stacked widget
         layout.addLayout(self.button_layout)
         layout.addWidget(self.stacked_widget)
@@ -102,6 +107,78 @@ class SearchRecommendationWindow(QWidget):
         ])
         layout.addWidget(self.tableWidget)
         self.setLayout(layout)
+
+
+    def create_review_ui(self):
+        """Create the UI for reviewing a movie."""
+        review_group = QGroupBox("Review a Movie")
+        review_layout = QVBoxLayout()
+
+        self.review_label = QLabel("Enter movie title:")
+        self.review_input = QLineEdit()
+        self.review_input.setPlaceholderText("Enter movie title...")
+
+        self.rating_label = QLabel("Enter your rating (1.0 - 5.0):")
+        self.rating_input = QDoubleSpinBox()
+        self.rating_input.setRange(1.0, 5.0)
+        self.rating_input.setSingleStep(0.1)
+        self.rating_input.setValue(3.0)
+
+        self.submit_review_button = QPushButton("Review a Film")
+        self.submit_review_button.clicked.connect(self.submit_review)
+
+        self.reviews_label = QLabel("Your Reviews:")
+        self.reviews_table = QTableWidget()
+        self.reviews_table.setColumnCount(2)
+        self.reviews_table.setHorizontalHeaderLabels(['Movie ID', 'Rating'])
+
+        review_layout.addWidget(self.review_label)
+        review_layout.addWidget(self.review_input)
+        review_layout.addWidget(self.rating_label)
+        review_layout.addWidget(self.rating_input)
+        review_layout.addWidget(self.submit_review_button)
+        review_layout.addWidget(self.reviews_label)
+        review_layout.addWidget(self.reviews_table)
+
+        review_group.setLayout(review_layout)
+        return review_group
+
+    def show_review_ui(self):
+        """Switch to the Review UI."""
+        self.stacked_widget.setCurrentWidget(self.review_ui)
+        self.load_user_reviews()
+
+    def load_user_reviews(self):
+        """Load and display reviews for the logged-in user."""
+        reviews = fetch_user_reviews(self.user_id)
+        self.reviews_table.setRowCount(0)
+        for row_data in reviews:
+            row_idx = self.reviews_table.rowCount()
+            self.reviews_table.insertRow(row_idx)
+            for col_idx, value in enumerate(row_data):
+                if col_idx >= 2:
+                    item = QTableWidgetItem(str(value))
+                    self.reviews_table.setItem(row_idx, col_idx - 2, item)
+        self.reviews_table.resizeColumnsToContents()
+
+    def submit_review(self):
+        """Submit the user's review to the database."""
+        movie_title = self.review_input.text()
+        rating = self.rating_input.value()
+        if not movie_title:
+            QMessageBox.warning(self, "Error", "Please enter a movie title.")
+            return
+        # Get the movie ID from the movie title
+        movie_id = get_film_id_by_name(movie_title)
+        if not movie_id:
+            QMessageBox.warning(self, "Error", "Movie not found.")
+            return
+        # Submit the review to the database
+        status = add_or_update_user_rating(self.user_id, movie_id, rating)
+        QMessageBox.information(self, "Review Status", status)
+        # Reload user reviews to show the new review
+        self.load_user_reviews()
+
 
     def log_out(self):
         """Handle user log out."""

@@ -62,7 +62,7 @@ class MainWindow(QMainWindow):
     def show_search_recommendation_view(self):
         """Show the search and recommendation view after login"""
         # Create an instance of SearchRecommendationWindow (your existing search and recommendation window)
-        self.search_recommendation_window = SearchRecommendationWindow(self.on_logout)
+        self.search_recommendation_window = SearchRecommendationWindow(self.on_logout, user_id=self.user_id)
         # Add it to the stacked layout
         self.layout.addWidget(self.search_recommendation_window)
         # Switch to the search/recommendation view
