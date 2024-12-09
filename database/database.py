@@ -3,11 +3,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 import configparser
 from sqlalchemy import (
-    create_engine, select, desc, insert
+    create_engine, select, desc, insert, update
 )
 from sqlalchemy.orm import Session
 from database.db_password import DATABASE_URL
-from database.database_info import users_table, content_table
+from database.database_info import users_table, content_table, user_interests_table
 
 
 Base = declarative_base()
@@ -38,18 +38,66 @@ def fetch_movies(offset=0, limit=10):
         session.close()
 
 
-def fetch_movies_by_title(title: str, limit=None, offset=0):
-    """Fetch movies from the database that contain the specified title."""
+def fetch_movies_by_title(title: str, genre=None, min_rating=None, max_rating=None, year=None, limit=None, offset=0):
+    """Fetch movies from the database that contain the specified title, with optional filters."""
     engine = create_engine(DATABASE_URL)
     session = Session(bind=engine)
     try:
         query = select(content_table).where(content_table.c.name.ilike(f"%{title}%"))
+        # Apply filters if provided
+        if genre:
+            query = query.where(content_table.c.genre == genre)
+        if min_rating:
+            query = query.where(content_table.c.rating >= min_rating)
+        if max_rating:
+            query = query.where(content_table.c.rating <= max_rating)
+        if year:
+            query = query.where(content_table.c.release_year == year)
         if limit is not None:
             query = query.limit(limit).offset(offset)
+
         results = session.execute(query).fetchall()
         return results
     except Exception as e:
         print(f"Error fetching movies: {e}")
         return []
+    finally:
+        session.close()
+
+
+def add_or_update_user_rating(user_id: int, movie_id: int, rating: float):
+    """Add or update a user's rating for a specific movie."""
+    # Create a database engine and session
+    engine = create_engine(DATABASE_URL)
+    session = Session(bind=engine)
+    try:
+        # Check if the user has already rated the movie
+        existing_rating = session.execute(
+            select(user_interests_table)
+            .where(user_interests_table.c.user_id == user_id)
+            .where(user_interests_table.c.content_id == movie_id)
+        ).scalar_one_or_none()
+        if existing_rating:
+            # If the user has already rated the movie, update the rating
+            stmt = update(user_interests_table).where(
+                user_interests_table.c.user_id == user_id,
+                user_interests_table.c.content_id == movie_id
+            ).values(score=rating)
+            session.execute(stmt)
+            session.commit()
+            return "Rating updated successfully."
+        else:
+            # If no rating exists, insert a new rating
+            stmt = insert(user_interests_table).values(user_id=user_id, content_id=movie_id, score=rating)
+            session.execute(stmt)
+            session.commit()
+            return "Rating added successfully."
+
+    except IntegrityError as e:
+        session.rollback()
+        return f"Database integrity error: {str(e)}"
+    except Exception as e:
+        session.rollback()
+        return f"An error occurred: {str(e)}"
     finally:
         session.close()
