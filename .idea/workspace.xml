@@ -7,7 +7,6 @@
     <list default="true" id="7543658a-c794-4e2e-8c1a-26fcf3b15d69" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/windows/search.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/search.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui/windows/user_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/windows/user_interface.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +84,7 @@
       <workItem from="1733771500198" duration="21000" />
       <workItem from="1733771528556" duration="3397000" />
       <workItem from="1733774938615" duration="914000" />
-      <workItem from="1733775863223" duration="5125000" />
+      <workItem from="1733775863223" duration="10267000" />
     </task>
     <servers />
   </component>
@@ -97,16 +96,16 @@
     <SUITE FILE_PATH="coverage/film_recommendation$registration.coverage" NAME="registration Coverage Results" MODIFIED="1733260499387" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui/windows" />
     <SUITE FILE_PATH="coverage/film_recommendation$database.coverage" NAME="database Coverage Results" MODIFIED="1733241472842" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/database" />
     <SUITE FILE_PATH="coverage/film_recommendation$search.coverage" NAME="search Coverage Results" MODIFIED="1733261229760" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui/windows" />
-    <SUITE FILE_PATH="coverage/main_py$registration.coverage" NAME="registration Coverage Results" MODIFIED="1733777293059" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui/windows" />
+    <SUITE FILE_PATH="coverage/main_py$registration.coverage" NAME="registration Coverage Results" MODIFIED="1733786117070" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui/windows" />
     <SUITE FILE_PATH="coverage/film_recommendation$user_interface.coverage" NAME="user_interface Coverage Results" MODIFIED="1733261283811" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui" />
     <SUITE FILE_PATH="coverage/main_py$database.coverage" NAME="database Coverage Results" MODIFIED="1733773925838" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/database" />
-    <SUITE FILE_PATH="coverage/main_py$user_interface.coverage" NAME="user_interface Coverage Results" MODIFIED="1733781554202" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui/windows" />
+    <SUITE FILE_PATH="coverage/main_py$user_interface.coverage" NAME="user_interface Coverage Results" MODIFIED="1733787006677" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui/windows" />
     <SUITE FILE_PATH="coverage/main_py$data_preparation.coverage" NAME="data_preparation Coverage Results" MODIFIED="1733775533224" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/model" />
     <SUITE FILE_PATH="coverage/main_py$login.coverage" NAME="login Coverage Results" MODIFIED="1733776728239" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui/windows" />
     <SUITE FILE_PATH="coverage/main_py$dataset_to_db.coverage" NAME="dataset_to_db Coverage Results" MODIFIED="1733776468978" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/database" />
     <SUITE FILE_PATH="coverage/film_recommendation$local_database_creation.coverage" NAME="local_database_creation Coverage Results" MODIFIED="1733239272335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/database" />
     <SUITE FILE_PATH="coverage/film_recommendation$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1733240387985" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui" />
     <SUITE FILE_PATH="coverage/main_py$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1733776796235" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui" />
-    <SUITE FILE_PATH="coverage/main_py$search.coverage" NAME="search Coverage Results" MODIFIED="1733781019282" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui/windows" />
+    <SUITE FILE_PATH="coverage/main_py$search.coverage" NAME="search Coverage Results" MODIFIED="1733786407275" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ui/windows" />
   </component>
 </project>

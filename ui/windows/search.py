@@ -49,13 +49,6 @@ class SearchRecommendationWindow(QWidget):
         self.limit = 10
         self.init_ui()
 
-    def center_window(self):
-        screen = self.screen()
-        screen_geometry = screen.geometry()
-        window_geometry = self.frameGeometry()
-        window_geometry.moveCenter(screen_geometry.center())
-        self.move(window_geometry.topLeft())
-
     def init_ui(self):
         layout = QVBoxLayout()
 
@@ -108,13 +101,12 @@ class SearchRecommendationWindow(QWidget):
 
         # Add the table for all views
         self.tableWidget = QTableWidget()
-        self.tableWidget.setColumnCount(10)
+        self.tableWidget.setColumnCount(7)
         self.tableWidget.setHorizontalHeaderLabels([
-            'ID', 'Title', 'Release Date', 'Genre', 'Revenue', 'Budget', 'Rating', 'Votes', 'Profit', 'Language'
+            'ID', 'Title', 'Release Date', 'Genre', 'Rating', 'Votes', 'Language'
         ])
         layout.addWidget(self.tableWidget)
         self.setLayout(layout)
-        self.center_window()
 
     def create_review_ui(self):
         """Create the UI for reviewing a movie."""
@@ -148,13 +140,14 @@ class SearchRecommendationWindow(QWidget):
         review_layout.addWidget(self.reviews_table)
 
         review_group.setLayout(review_layout)
-        review_group.setFixedHeight(400)
         return review_group
 
     def show_review_ui(self):
         """Switch to the Review UI."""
         self.stacked_widget.setCurrentWidget(self.review_ui)
+        self.tableWidget.hide()
         self.load_user_reviews()
+        self.stacked_widget.setFixedHeight(500)
 
     def load_user_reviews(self):
         """Load and display reviews for the logged-in user."""
@@ -269,10 +262,16 @@ class SearchRecommendationWindow(QWidget):
         for row_data in movies:
             row_idx = current_row_count
             self.tableWidget.insertRow(row_idx)
-            for col_idx, value in enumerate(row_data):
+            # Skip columns at indices 4, 5, and 8 (Revenue, Budget, Profit)
+            filtered_data = [value for i, value in enumerate(row_data) if i not in {4, 5, 8}]
+            for col_idx, value in enumerate(filtered_data):
+                if isinstance(value, float):
+                    value = f"{value:.2f}"
                 item = QTableWidgetItem(str(value))
                 self.tableWidget.setItem(row_idx, col_idx, item)
         self.tableWidget.resizeColumnsToContents()
+
+
 
     def search_film(self):
         """Search for films by title and display all matching results."""
@@ -346,15 +345,21 @@ class SearchRecommendationWindow(QWidget):
             QMessageBox.information(self, "No Recommendations", "No recommendations found.")
 
     def show_search_ui(self):
+        self.tableWidget.show()  # Show the table widget when switching
         self.tableWidget.setRowCount(0)  # Clear table when switching to Search
         self.stacked_widget.setCurrentWidget(self.search_ui)
+        self.stacked_widget.setFixedHeight(160)
 
     def show_recommend_ui(self):
+        self.tableWidget.show()
         self.tableWidget.setRowCount(0)  # Clear table when switching to Recommendation
         self.stacked_widget.setCurrentWidget(self.recommend_ui)
+        self.stacked_widget.setFixedHeight(160)
 
     def show_top_movies_ui(self):
+        self.tableWidget.show()
         self.tableWidget.setRowCount(0)  # Clear table when switching to Top Movies
         self.offset = 0  # Reset the offset
         self.stacked_widget.setCurrentWidget(self.top_movies_ui)
         self.show_top_recommendations()
+        self.stacked_widget.setFixedHeight(160)
