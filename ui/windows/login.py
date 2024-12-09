@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QLineEdit, QVBoxLayout,
     QWidget, QMessageBox
 )
-from ui.windows.search import SearchRecommendationWindow
+from database.database import authenticate_user
 
 class LoginWindow(QWidget):
     def __init__(self, on_complete_callback, callback_button):
@@ -41,16 +41,17 @@ class LoginWindow(QWidget):
     def login_user(self):
         username = self.username_input.text()
         password = self.password_input.text()
-
-        # Placeholder for authentication logic
-        if username and password:
-            QMessageBox.information(self, "Success", "Log in successful!")
-            self.on_complete_callback()  # Callback to switch to main grid view
+        if not username or not password:
+            QMessageBox.warning(self, "Input Error", "Please enter both username and password.")
+            return
+        result = authenticate_user(username, password)
+        if result == "Authentication successful.":
+            QMessageBox.information(self, "Login Successful", "You are now logged in!")
+            self.on_complete_callback()
             self.close()
         else:
-            QMessageBox.warning(self, "Error", "Invalid credentials.")
+            QMessageBox.warning(self, "Authentication Failed", result)
 
     def back_to_main(self):
-        # Go back to the main window (Welcome screen)
         self.callback_button()
         self.close()

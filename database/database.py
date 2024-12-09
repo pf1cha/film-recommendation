@@ -8,13 +8,13 @@ from sqlalchemy import (
 from sqlalchemy.orm import Session
 from database.db_password import DATABASE_URL
 from database.database_info import users_table, content_table, user_interests_table
-
+from utils.utils import hash_password
 
 Base = declarative_base()
 
 
 def add_user(username, hashed_password):
-    engine = create_engine(DATABASE_URL, echo=True, future=True)
+    engine = create_engine(DATABASE_URL)
     stmt = insert(users_table).values(username=username, hash_password=hashed_password)
     try:
         with engine.connect() as conn:
@@ -25,6 +25,25 @@ def add_user(username, hashed_password):
         return "Username already exists."
     except Exception as e:
         return f"An error occurred: {str(e)}"
+
+
+def authenticate_user(username: str, password: str):
+    engine = create_engine(DATABASE_URL)
+    session = Session(bind=engine)
+    try:
+        user = session.query(users_table).filter_by(username=username).one_or_none()
+        if user is None:
+            return "User not found."
+        hashed_password = hash_password(password)
+        if hashed_password == user.hash_password:
+            return "Authentication successful."
+        else:
+            return "Invalid password."
+    except Exception as e:
+        session.rollback()
+        return f"An error occurred: {str(e)}"
+    finally:
+        session.close()
 
 
 def fetch_movies(offset=0, limit=10):
