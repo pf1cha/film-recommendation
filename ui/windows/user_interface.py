@@ -72,6 +72,8 @@ class MainWindow(QMainWindow):
 
     def on_logout(self):
         """Handle the logout and show the welcome screen"""
+        self.username = None
+        self.user_id = None
         self.layout.setCurrentWidget(self.main_page)
         self.setWindowTitle("Welcome")
-        self.resize(300, 200)  # Resize back to the welcome screen size
+        self.resize(100, 100)
