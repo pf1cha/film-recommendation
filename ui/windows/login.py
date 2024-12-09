@@ -5,10 +5,10 @@ from PyQt6.QtWidgets import (
 from database.database import authenticate_user
 
 class LoginWindow(QWidget):
-    def __init__(self, on_complete_callback, callback_button):
+    def __init__(self, login_callback, registration_callback):
         super().__init__()
-        self.on_complete_callback = on_complete_callback
-        self.callback_button = callback_button
+        self.login_callback = login_callback
+        self.registration_callback = registration_callback
         self.setWindowTitle("Log In")
         self.setGeometry(350, 350, 300, 200)
         self.init_ui()
@@ -44,14 +44,14 @@ class LoginWindow(QWidget):
         if not username or not password:
             QMessageBox.warning(self, "Input Error", "Please enter both username and password.")
             return
-        result = authenticate_user(username, password)
-        if result == "Authentication successful.":
+        status, user_id = authenticate_user(username, password)
+        if status == "Authentication successful.":
+            self.login_callback(username, user_id)
             QMessageBox.information(self, "Login Successful", "You are now logged in!")
-            self.on_complete_callback()
             self.close()
         else:
-            QMessageBox.warning(self, "Authentication Failed", result)
+            QMessageBox.warning(self, "Authentication Failed", status)
 
     def back_to_main(self):
-        self.callback_button()
+        self.registration_callback()
         self.close()

@@ -33,17 +33,18 @@ def authenticate_user(username: str, password: str):
     try:
         user = session.query(users_table).filter_by(username=username).one_or_none()
         if user is None:
-            return "User not found."
+            return "User not found.", None
         hashed_password = hash_password(password)
         if hashed_password == user.hash_password:
-            return "Authentication successful."
+            return "Authentication successful.", user.id
         else:
-            return "Invalid password."
+            return "Invalid password.", None
     except Exception as e:
         session.rollback()
-        return f"An error occurred: {str(e)}"
+        return f"An error occurred: {str(e)}", None
     finally:
         session.close()
+
 
 
 def fetch_movies(offset=0, limit=10):
