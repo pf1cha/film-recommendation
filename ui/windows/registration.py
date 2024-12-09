@@ -5,37 +5,40 @@ from PyQt6.QtWidgets import (
 from database.database import add_user
 import hashlib
 
-
 def hash_password(password):
     """Hash the password using SHA-256."""
     return hashlib.sha256(password.encode()).hexdigest()
 
-
 class RegistrationWindow(QWidget):
-    def __init__(self):
+    def __init__(self, on_complete_callback):
         super().__init__()
+        self.on_complete_callback = on_complete_callback
         self.setWindowTitle("Register")
         self.setGeometry(350, 350, 300, 200)
-
         self.init_ui()
 
     def init_ui(self):
         layout = QVBoxLayout()
+
         self.username_label = QLabel("Username:")
         self.username_input = QLineEdit()
 
         self.password_label = QLabel("Password:")
         self.password_input = QLineEdit()
-        # self.password_input.setEchoMode(QLineEdit.Password)
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
 
         self.register_button = QPushButton("Register")
         self.register_button.clicked.connect(self.register_user)
+
+        self.back_button = QPushButton("Back")
+        self.back_button.clicked.connect(self.back_to_main)
 
         layout.addWidget(self.username_label)
         layout.addWidget(self.username_input)
         layout.addWidget(self.password_label)
         layout.addWidget(self.password_input)
         layout.addWidget(self.register_button)
+        layout.addWidget(self.back_button)
 
         self.setLayout(layout)
 
@@ -48,11 +51,17 @@ class RegistrationWindow(QWidget):
             return
 
         hashed_password = hash_password(password)
-        print(username, hashed_password)
+
         result_message = add_user(username, hashed_password)
 
         if "successfully" in result_message:
             QMessageBox.information(self, "Success", result_message)
-            self.close()
+            self.on_complete_callback()  # Callback to switch back to the main window
+            self.close()  # Close the registration window
         else:
             QMessageBox.warning(self, "Error", result_message)
+
+    def back_to_main(self):
+        # Go back to the main window (Welcome screen)
+        self.on_complete_callback()
+        self.close()
