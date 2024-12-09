@@ -77,7 +77,7 @@ class SearchRecommendationWindow(QWidget):
 
         # Stacked widget to switch between the different UIs
         self.stacked_widget = QStackedWidget()
-        self.stacked_widget.setFixedHeight(400)  # Set a fixed height for all UIs
+        self.stacked_widget.setFixedHeight(160)  # Set a fixed height for all UIs
 
         # Create Search UI
         self.search_ui = self.create_search_ui()
@@ -141,6 +141,7 @@ class SearchRecommendationWindow(QWidget):
         review_layout.addWidget(self.reviews_table)
 
         review_group.setLayout(review_layout)
+        review_group.setFixedHeight(400)
         return review_group
 
     def show_review_ui(self):
@@ -236,11 +237,13 @@ class SearchRecommendationWindow(QWidget):
         top_movies_group.setContentsMargins(5, 5, 5, 5)  # left, top, right, bottom
 
         top_movies_layout = QVBoxLayout()
-        top_movies_layout.addWidget(QLabel("Top 10 Movies by Ratings"))
+        top_movies_label = QLabel("Top 10 Movies by Ratings")
+        top_movies_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        top_movies_layout.addWidget(top_movies_label)
 
         # Create the "Show More" button for Top Movies UI
         self.show_more_button = QPushButton("Show More")
-        self.show_more_button.clicked.connect(self.show_more)
+        self.show_more_button.clicked.connect(lambda: self.show_more(top_movies_label))
         top_movies_layout.addWidget(self.show_more_button)
 
         # Set the layout for the Top Movies Group Box
@@ -308,7 +311,7 @@ class SearchRecommendationWindow(QWidget):
         # Optionally, inform the user that recommendations have been displayed
         QMessageBox.information(self, "Recommendation", "Recommended Films based on your query.")
 
-    def show_more(self):
+    def show_more(self, top_movies_label):
         """Show more movies when the user clicks 'Show More'."""
         movies = fetch_movies(offset=self.offset, limit=self.limit)
         if not movies:
@@ -316,6 +319,8 @@ class SearchRecommendationWindow(QWidget):
             QMessageBox.information(self, "No More Movies", "No more movies available.")
             return
         self.display_results(movies)
+        current_count = self.offset
+        top_movies_label.setText(f"Top {current_count} Movies by Ratings")
 
     def show_top_recommendations(self):
         """Fetch and display the top 10 most popular movies."""
