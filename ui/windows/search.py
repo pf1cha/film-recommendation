@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QLineEdit, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QWidget, QMessageBox
 )
+from PyQt6.QtCore import QSize
 from database.database import fetch_movies, fetch_movies_by_title
 
 
@@ -9,7 +10,8 @@ class SearchRecommendationWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Search and Recommendation")
-        self.setGeometry(100, 100, 1000, 500)  # Adjust window size
+        self.resize(QSize(1000, 500))
+        # self.setGeometry(100, 100, 1000, 500)
         # Pagination variables
         self.offset = 0
         self.limit = 10

@@ -8,7 +8,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Welcome")
-        self.setGeometry(500, 500, 300, 200)
+        self.setGeometry(100, 100, 300, 200)
         self.init_ui()
 
     def init_ui(self):
@@ -59,10 +59,8 @@ class MainWindow(QMainWindow):
         """Show the search and recommendation view after login"""
         # Create an instance of SearchRecommendationWindow (your existing search and recommendation window)
         self.search_recommendation_window = SearchRecommendationWindow()
-
         # Add it to the stacked layout
         self.layout.addWidget(self.search_recommendation_window)
-
         # Switch to the search/recommendation view
         self.layout.setCurrentWidget(self.search_recommendation_window)
-
+        self.resize(1000, 500)
