@@ -101,3 +101,41 @@ def add_or_update_user_rating(user_id: int, movie_id: int, rating: float):
         return f"An error occurred: {str(e)}"
     finally:
         session.close()
+
+
+def fetch_films_by_ids(film_ids):
+    """Fetch films from the database that match the given list of film IDs."""
+    if not film_ids:
+        return []
+    engine = create_engine(DATABASE_URL)
+    session = Session(bind=engine)
+    try:
+        # Use a select query to fetch films with IDs that match the ones in the list
+        query = select(content_table).where(content_table.c.id.in_(film_ids))
+        result = session.execute(query).fetchall()
+        # Return the results (which are the films from the database)
+        return result
+    except Exception as e:
+        print(f"Error fetching films: {e}")
+        return []
+    finally:
+        session.close()
+
+def get_film_id_by_name(film_name):
+    """Fetch the movie ID based on the movie name."""
+    engine = create_engine(DATABASE_URL)
+    session = Session(bind=engine)
+    try:
+        # Query the database to find the movie by name
+        query = select(content_table).where(content_table.c.name.ilike(f"{film_name}"))
+        result = session.execute(query).fetchone()
+        if result:
+            return result.id  # Assuming the column 'id' contains the movie ID
+        else:
+            return None  # Movie not found
+    except Exception as e:
+        session.close()
+        raise e
+    finally:
+        session.close()
+
