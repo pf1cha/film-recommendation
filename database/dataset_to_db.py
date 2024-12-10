@@ -29,14 +29,13 @@ session = Session()
 # Function to insert a record while handling duplicates
 def insert_record(session, row):
     if len(row['title']) < 100:
-        release_date = row['release_date'] if pd.notnull(row['release_date']) else None
         stmt = insert(content_table).values(
             id=row['id'],
             name=row['title'],
             vote_average=row['vote_average'],
             vote_count=row['vote_count'],
             genre=row['genres'].split(', ')[0],
-            release_date=release_date,
+            release_date=row['release_date'],
             revenue=row['revenue'],
             runtime=row['runtime'],
             budget=row['budget'],
