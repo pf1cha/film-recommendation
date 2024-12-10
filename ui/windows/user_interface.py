@@ -1,14 +1,28 @@
-from PyQt6.QtWidgets import QMainWindow, QPushButton, QVBoxLayout, QStackedLayout, QWidget
+import sys
+from PyQt6.QtWidgets import QMainWindow, QPushButton, QVBoxLayout, QStackedLayout, QWidget, QApplication
 from ui.windows.registration import RegistrationWindow
 from ui.windows.login import LoginWindow
 from ui.windows.search import SearchRecommendationWindow
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Welcome")
         self.setGeometry(100, 100, 300, 200)
+        self.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QLabel {
+                font-size: 14px;
+            }
+        """)
         self.init_ui()
         self.username = None
         self.user_id = None
@@ -36,6 +50,7 @@ class MainWindow(QMainWindow):
 
         # Add the welcome page to the stacked layout
         self.layout.addWidget(self.main_page)
+
 
     def open_registration(self):
         """Handle the Registration Window"""
@@ -77,3 +92,9 @@ class MainWindow(QMainWindow):
         self.layout.setCurrentWidget(self.main_page)
         self.setWindowTitle("Welcome")
         self.resize(100, 100)
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    main_window = MainWindow()
+    main_window.show()
+    sys.exit(app.exec())
