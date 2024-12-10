@@ -78,7 +78,7 @@ class SearchRecommendationWindow(QWidget):
 
         # Stacked widget to switch between the different UIs
         self.stacked_widget = QStackedWidget()
-        self.stacked_widget.setFixedHeight(160)  # Set a fixed height for all UIs
+        self.stacked_widget.setFixedHeight(200)  # Set a fixed height for all UIs
 
         # Create Search UI
         self.search_ui = self.create_search_ui()
@@ -184,7 +184,6 @@ class SearchRecommendationWindow(QWidget):
         self.reviews_table.setRowCount(0)
 
         for row_data in reviews:
-            print(f"Processing review row: {row_data}")  # Debugging output
             row_idx = self.reviews_table.rowCount()
             self.reviews_table.insertRow(row_idx)
 
@@ -245,16 +244,21 @@ class SearchRecommendationWindow(QWidget):
         search_group = QGroupBox("Search Movies")
         search_layout = QVBoxLayout()
 
-        self.search_label = QLabel("Enter movie title:")
+        self.search_label = QLabel("Enter movie title or genre:")
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search for a movie...")
-
-        self.search_action_button = QPushButton("Search")
+        self.search_action_button = QPushButton("Search by Title")
         self.search_action_button.clicked.connect(self.search_film)
+
+        self.search_genre_button = QPushButton("Search by Genre")
+        self.search_genre_button.clicked.connect(self.search_film_by_genre)
 
         search_layout.addWidget(self.search_label)
         search_layout.addWidget(self.search_input)
+
         search_layout.addWidget(self.search_action_button)
+        search_layout.addWidget(self.search_genre_button)
+
 
         search_group.setLayout(search_layout)
         return search_group
@@ -337,6 +341,22 @@ class SearchRecommendationWindow(QWidget):
         else:
             QMessageBox.information(self, "No Results", "No films found matching your search.")
 
+    def search_film_by_genre(self):
+        """Search for films by genre and display all matching results."""
+        genre = self.search_input.text()
+        if not genre:
+            QMessageBox.warning(self, "Error", "Please enter a genre.")
+            return
+
+        self.tableWidget.setRowCount(0)
+        self.offset = 0
+
+        results = fetch_movies_by_title("", genre=genre)
+        if results:
+            self.display_results(results)
+        else:
+            QMessageBox.information(self, "No Results", "No films found matching your search.")
+
     def get_recommendation(self):
         """Fetch movie recommendations based on the input title or ID."""
         film_name_or_id = self.recommend_input.text()
@@ -399,7 +419,7 @@ class SearchRecommendationWindow(QWidget):
         self.tableWidget.show()  # Show the table widget when switching
         self.tableWidget.setRowCount(0)  # Clear table when switching to Search
         self.stacked_widget.setCurrentWidget(self.search_ui)
-        self.stacked_widget.setFixedHeight(160)
+        self.stacked_widget.setFixedHeight(200)
 
     def show_recommend_ui(self):
         self.tableWidget.show()
