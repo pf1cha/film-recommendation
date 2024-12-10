@@ -127,9 +127,32 @@ class SearchRecommendationWindow(QWidget):
         self.submit_review_button.clicked.connect(self.submit_review)
 
         self.reviews_label = QLabel("Your Reviews:")
+        self.reviews_label.setStyleSheet("font-size: 18px; font-weight: bold; margin-bottom: 10px;")
+
         self.reviews_table = QTableWidget()
         self.reviews_table.setColumnCount(2)
-        self.reviews_table.setHorizontalHeaderLabels(['Movie ID', 'Rating'])
+        self.reviews_table.setHorizontalHeaderLabels(['Title', 'Rating'])
+        self.reviews_table.setStyleSheet("""
+            QTableWidget {
+            background-color: #2b2b2b;
+            border: 1px solid #555;
+            font-size: 16px;
+            color: #f0f0f0;
+            }
+            QHeaderView::section {
+                background-color: #4CAF50;
+                color: white;
+                font-size: 16px;
+            }
+            QTableWidget::item {
+                padding: 10px;
+            }
+            QTableWidget::item:hover {
+                background-color: #3e3e3e;
+            }
+        """)
+        self.reviews_table.horizontalHeader().setStretchLastSection(True)
+        self.reviews_table.verticalHeader().setVisible(False)
 
         review_layout.addWidget(self.review_label)
         review_layout.addWidget(self.review_input)
@@ -141,7 +164,6 @@ class SearchRecommendationWindow(QWidget):
 
         review_group.setLayout(review_layout)
         return review_group
-
     def show_review_ui(self):
         """Switch to the Review UI."""
         self.stacked_widget.setCurrentWidget(self.review_ui)
@@ -158,6 +180,8 @@ class SearchRecommendationWindow(QWidget):
             self.reviews_table.insertRow(row_idx)
             for col_idx, value in enumerate(row_data):
                 if col_idx >= 2:
+                    if isinstance(value, float):
+                        value = f"{value:.2f}"
                     item = QTableWidgetItem(str(value))
                     self.reviews_table.setItem(row_idx, col_idx - 2, item)
         self.reviews_table.resizeColumnsToContents()
