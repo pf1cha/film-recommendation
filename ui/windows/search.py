@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (
     QWidget, QMessageBox, QGroupBox, QStackedWidget, QInputDialog, QDoubleSpinBox
 )
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QColor, QPalette
+from PyQt6.QtGui import QScreen
 from database.database import (fetch_movies, fetch_movies_by_title,
                                fetch_films_by_ids, get_film_id_by_name, add_or_update_user_rating, fetch_user_reviews)
 from model.functions import recommend_movies_with_model
@@ -77,7 +77,7 @@ class SearchRecommendationWindow(QWidget):
 
         # Stacked widget to switch between the different UIs
         self.stacked_widget = QStackedWidget()
-        self.stacked_widget.setFixedHeight(400)  # Set a fixed height for all UIs
+        self.stacked_widget.setFixedHeight(160)  # Set a fixed height for all UIs
 
         # Create Search UI
         self.search_ui = self.create_search_ui()
@@ -101,13 +101,12 @@ class SearchRecommendationWindow(QWidget):
 
         # Add the table for all views
         self.tableWidget = QTableWidget()
-        self.tableWidget.setColumnCount(10)
+        self.tableWidget.setColumnCount(7)
         self.tableWidget.setHorizontalHeaderLabels([
-            'ID', 'Title', 'Release Date', 'Genre', 'Revenue', 'Budget', 'Rating', 'Votes', 'Profit', 'Language'
+            'ID', 'Title', 'Release Date', 'Genre', 'Rating', 'Votes', 'Language'
         ])
         layout.addWidget(self.tableWidget)
         self.setLayout(layout)
-
 
     def create_review_ui(self):
         """Create the UI for reviewing a movie."""
@@ -118,19 +117,42 @@ class SearchRecommendationWindow(QWidget):
         self.review_input = QLineEdit()
         self.review_input.setPlaceholderText("Enter movie title...")
 
-        self.rating_label = QLabel("Enter your rating (1.0 - 5.0):")
+        self.rating_label = QLabel("Enter your rating (1.0 - 10.0):")
         self.rating_input = QDoubleSpinBox()
-        self.rating_input.setRange(1.0, 5.0)
+        self.rating_input.setRange(1.0, 10.0)
         self.rating_input.setSingleStep(0.1)
-        self.rating_input.setValue(3.0)
+        self.rating_input.setValue(5.0)
 
         self.submit_review_button = QPushButton("Review a Film")
         self.submit_review_button.clicked.connect(self.submit_review)
 
         self.reviews_label = QLabel("Your Reviews:")
+        self.reviews_label.setStyleSheet("font-size: 18px; font-weight: bold; margin-bottom: 10px;")
+
         self.reviews_table = QTableWidget()
         self.reviews_table.setColumnCount(2)
-        self.reviews_table.setHorizontalHeaderLabels(['Movie ID', 'Rating'])
+        self.reviews_table.setHorizontalHeaderLabels(['Title', 'Rating'])
+        self.reviews_table.setStyleSheet("""
+            QTableWidget {
+            background-color: #2b2b2b;
+            border: 1px solid #555;
+            font-size: 16px;
+            color: #f0f0f0;
+            }
+            QHeaderView::section {
+                background-color: #4CAF50;
+                color: white;
+                font-size: 16px;
+            }
+            QTableWidget::item {
+                padding: 10px;
+            }
+            QTableWidget::item:hover {
+                background-color: #3e3e3e;
+            }
+        """)
+        self.reviews_table.horizontalHeader().setStretchLastSection(True)
+        self.reviews_table.verticalHeader().setVisible(False)
 
         review_layout.addWidget(self.review_label)
         review_layout.addWidget(self.review_input)
@@ -142,11 +164,12 @@ class SearchRecommendationWindow(QWidget):
 
         review_group.setLayout(review_layout)
         return review_group
-
     def show_review_ui(self):
         """Switch to the Review UI."""
         self.stacked_widget.setCurrentWidget(self.review_ui)
+        self.tableWidget.hide()
         self.load_user_reviews()
+        self.stacked_widget.setFixedHeight(500)
 
     def load_user_reviews(self):
         """Load and display reviews for the logged-in user."""
@@ -157,6 +180,8 @@ class SearchRecommendationWindow(QWidget):
             self.reviews_table.insertRow(row_idx)
             for col_idx, value in enumerate(row_data):
                 if col_idx >= 2:
+                    if isinstance(value, float):
+                        value = f"{value:.2f}"
                     item = QTableWidgetItem(str(value))
                     self.reviews_table.setItem(row_idx, col_idx - 2, item)
         self.reviews_table.resizeColumnsToContents()
@@ -178,7 +203,6 @@ class SearchRecommendationWindow(QWidget):
         QMessageBox.information(self, "Review Status", status)
         # Reload user reviews to show the new review
         self.load_user_reviews()
-
 
     def log_out(self):
         """Handle user log out."""
@@ -236,11 +260,13 @@ class SearchRecommendationWindow(QWidget):
         top_movies_group.setContentsMargins(5, 5, 5, 5)  # left, top, right, bottom
 
         top_movies_layout = QVBoxLayout()
-        top_movies_layout.addWidget(QLabel("Top 10 Movies by Ratings"))
+        top_movies_label = QLabel("Top 10 Movies by Ratings")
+        top_movies_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        top_movies_layout.addWidget(top_movies_label)
 
         # Create the "Show More" button for Top Movies UI
         self.show_more_button = QPushButton("Show More")
-        self.show_more_button.clicked.connect(self.show_more)
+        self.show_more_button.clicked.connect(lambda: self.show_more(top_movies_label))
         top_movies_layout.addWidget(self.show_more_button)
 
         # Set the layout for the Top Movies Group Box
@@ -260,10 +286,16 @@ class SearchRecommendationWindow(QWidget):
         for row_data in movies:
             row_idx = current_row_count
             self.tableWidget.insertRow(row_idx)
-            for col_idx, value in enumerate(row_data):
+            # Skip columns at indices 4, 5, and 8 (Revenue, Budget, Profit)
+            filtered_data = [value for i, value in enumerate(row_data) if i not in {4, 5, 8}]
+            for col_idx, value in enumerate(filtered_data):
+                if isinstance(value, float):
+                    value = f"{value:.2f}"
                 item = QTableWidgetItem(str(value))
                 self.tableWidget.setItem(row_idx, col_idx, item)
         self.tableWidget.resizeColumnsToContents()
+
+
 
     def search_film(self):
         """Search for films by title and display all matching results."""
@@ -308,7 +340,7 @@ class SearchRecommendationWindow(QWidget):
         # Optionally, inform the user that recommendations have been displayed
         QMessageBox.information(self, "Recommendation", "Recommended Films based on your query.")
 
-    def show_more(self):
+    def show_more(self, top_movies_label):
         """Show more movies when the user clicks 'Show More'."""
         movies = fetch_movies(offset=self.offset, limit=self.limit)
         if not movies:
@@ -316,6 +348,8 @@ class SearchRecommendationWindow(QWidget):
             QMessageBox.information(self, "No More Movies", "No more movies available.")
             return
         self.display_results(movies)
+        current_count = self.offset
+        top_movies_label.setText(f"Top {current_count} Movies by Ratings")
 
     def show_top_recommendations(self):
         """Fetch and display the top 10 most popular movies."""
@@ -335,15 +369,21 @@ class SearchRecommendationWindow(QWidget):
             QMessageBox.information(self, "No Recommendations", "No recommendations found.")
 
     def show_search_ui(self):
+        self.tableWidget.show()  # Show the table widget when switching
         self.tableWidget.setRowCount(0)  # Clear table when switching to Search
         self.stacked_widget.setCurrentWidget(self.search_ui)
+        self.stacked_widget.setFixedHeight(160)
 
     def show_recommend_ui(self):
+        self.tableWidget.show()
         self.tableWidget.setRowCount(0)  # Clear table when switching to Recommendation
         self.stacked_widget.setCurrentWidget(self.recommend_ui)
+        self.stacked_widget.setFixedHeight(160)
 
     def show_top_movies_ui(self):
+        self.tableWidget.show()
         self.tableWidget.setRowCount(0)  # Clear table when switching to Top Movies
         self.offset = 0  # Reset the offset
         self.stacked_widget.setCurrentWidget(self.top_movies_ui)
         self.show_top_recommendations()
+        self.stacked_widget.setFixedHeight(160)
