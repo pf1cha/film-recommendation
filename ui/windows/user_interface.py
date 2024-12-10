@@ -92,9 +92,3 @@ class MainWindow(QMainWindow):
         self.layout.setCurrentWidget(self.main_page)
         self.setWindowTitle("Welcome")
         self.resize(100, 100)
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
-    sys.exit(app.exec())

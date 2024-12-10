@@ -1,6 +1,6 @@
 import unittest
 from PyQt6.QtWidgets import QApplication
-from ui.user_interface import MainWindow
+from ui.windows.user_interface import MainWindow
 
 class TestMainWindow(unittest.TestCase):
     @classmethod

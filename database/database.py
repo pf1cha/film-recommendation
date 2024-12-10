@@ -141,6 +141,22 @@ def fetch_films_by_ids(film_ids):
     finally:
         session.close()
 
+
+def is_id_in_table(id):
+    """Check if the given ID is present in the database."""
+    engine = create_engine(DATABASE_URL)
+    session = Session(bind=engine)
+    try:
+        # Query the database to find the ID
+        query = select(content_table).where(content_table.c.id == id)
+        result = session.execute(query).fetchone()
+        return result is not None
+    except Exception as e:
+        session.close()
+        raise e
+    finally:
+        session.close()
+
 def get_film_id_by_name(film_name):
     """Fetch the movie ID based on the movie name."""
     engine = create_engine(DATABASE_URL)
