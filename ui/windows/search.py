@@ -2,10 +2,11 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
     QWidget, QMessageBox, QGroupBox, QStackedWidget, QInputDialog, QDoubleSpinBox
 )
-from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QScreen
+from PyQt6.QtCore import Qt
 from database.database import (fetch_movies, fetch_movies_by_title,
-                               fetch_films_by_ids, get_film_id_by_name, add_or_update_user_rating, fetch_user_reviews)
+                               fetch_films_by_ids, get_film_id_by_name,
+                               add_or_update_user_rating, fetch_user_reviews,
+                               is_id_in_table)
 from model.functions import recommend_movies_with_model
 
 
@@ -324,6 +325,9 @@ class SearchRecommendationWindow(QWidget):
             film_id = int(film_name_or_id)
         except ValueError:
             film_id = get_film_id_by_name(film_name_or_id)
+        if film_id is None or not is_id_in_table(film_id):
+            QMessageBox.warning(self, "Nonexistent movie", "This movie doesn't exist in database")
+            return
         # Get recommendations using the model
         recommendation = recommend_movies_with_model(film_id).tolist()
         # Debugging output to check the recommendation
