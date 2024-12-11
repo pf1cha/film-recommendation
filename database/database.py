@@ -189,3 +189,26 @@ def fetch_user_reviews(user_id):
         raise e
     finally:
         session.close()
+
+def get_film_title_by_id(film_id):
+    """
+    Fetch the film title by its ID from the database.
+    Args:
+        film_id (int): The ID of the film to fetch.
+    Returns:
+        str: The title of the film, or None if not found.
+    """
+    engine = create_engine(DATABASE_URL)
+    session = Session(bind=engine)
+    try:
+        result = session.query(content_table.c.name).filter(content_table.c.id == film_id).first()
+        if result:
+            title = result[0]  # Extract the name from the tuple
+            return title
+        print(f"Title not found for film ID: {film_id}")
+        return None
+    except Exception as e:
+        print(f"Error fetching title for film ID {film_id}: {e}")
+        return None
+    finally:
+        session.close()

@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt
 from database.database import (fetch_movies, fetch_movies_by_title,
                                fetch_films_by_ids, get_film_id_by_name,
                                add_or_update_user_rating, fetch_user_reviews,
-                               is_id_in_table)
+                               is_id_in_table, get_film_title_by_id)
 from model.functions import recommend_movies_with_model
 
 
@@ -78,7 +78,7 @@ class SearchRecommendationWindow(QWidget):
 
         # Stacked widget to switch between the different UIs
         self.stacked_widget = QStackedWidget()
-        self.stacked_widget.setFixedHeight(160)  # Set a fixed height for all UIs
+        self.stacked_widget.setFixedHeight(200)  # Set a fixed height for all UIs
 
         # Create Search UI
         self.search_ui = self.create_search_ui()
@@ -173,18 +173,40 @@ class SearchRecommendationWindow(QWidget):
         self.stacked_widget.setFixedHeight(500)
 
     def load_user_reviews(self):
-        """Load and display reviews for the logged-in user."""
+        """
+        Load and display reviews for the logged-in user.
+        """
         reviews = fetch_user_reviews(self.user_id)
+        if not reviews:
+            print("No reviews found for the user.")
+            return
+
         self.reviews_table.setRowCount(0)
+
         for row_data in reviews:
             row_idx = self.reviews_table.rowCount()
             self.reviews_table.insertRow(row_idx)
+
             for col_idx, value in enumerate(row_data):
-                if col_idx >= 2:
-                    if isinstance(value, float):
-                        value = f"{value:.2f}"
+                if col_idx == 2:  # Title ID
+                    film_title = get_film_title_by_id(value)
+                    value = film_title if film_title else f"Unknown ID: {value}"
+                elif col_idx == 3:  # Rating
+                    if isinstance(value, (int, float)):
+                        value = f"{value:.1f}"  # Format rating to one decimal place
+
+                # Adjust col_idx for the UI table:
+                ui_col_idx = col_idx - 2  # Align columns for title and rating
+                if ui_col_idx >= 0:
                     item = QTableWidgetItem(str(value))
-                    self.reviews_table.setItem(row_idx, col_idx - 2, item)
+                    item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)  # Center the content
+                    self.reviews_table.setItem(row_idx, ui_col_idx, item)
+
+        # Set column widths to be half of the table width
+        table_width = self.reviews_table.width()
+        self.reviews_table.setColumnWidth(0, table_width // 2)  # Title column
+        self.reviews_table.setColumnWidth(1, table_width // 2)  # Rating column
+
         self.reviews_table.resizeColumnsToContents()
 
     def submit_review(self):
@@ -222,16 +244,21 @@ class SearchRecommendationWindow(QWidget):
         search_group = QGroupBox("Search Movies")
         search_layout = QVBoxLayout()
 
-        self.search_label = QLabel("Enter movie title:")
+        self.search_label = QLabel("Enter movie title or genre:")
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search for a movie...")
-
-        self.search_action_button = QPushButton("Search")
+        self.search_action_button = QPushButton("Search by Title")
         self.search_action_button.clicked.connect(self.search_film)
+
+        self.search_genre_button = QPushButton("Search by Genre")
+        self.search_genre_button.clicked.connect(self.search_film_by_genre)
 
         search_layout.addWidget(self.search_label)
         search_layout.addWidget(self.search_input)
+
         search_layout.addWidget(self.search_action_button)
+        search_layout.addWidget(self.search_genre_button)
+
 
         search_group.setLayout(search_layout)
         return search_group
@@ -314,6 +341,22 @@ class SearchRecommendationWindow(QWidget):
         else:
             QMessageBox.information(self, "No Results", "No films found matching your search.")
 
+    def search_film_by_genre(self):
+        """Search for films by genre and display all matching results."""
+        genre = self.search_input.text()
+        if not genre:
+            QMessageBox.warning(self, "Error", "Please enter a genre.")
+            return
+
+        self.tableWidget.setRowCount(0)
+        self.offset = 0
+
+        results = fetch_movies_by_title("", genre=genre)
+        if results:
+            self.display_results(results)
+        else:
+            QMessageBox.information(self, "No Results", "No films found matching your search.")
+
     def get_recommendation(self):
         """Fetch movie recommendations based on the input title or ID."""
         film_name_or_id = self.recommend_input.text()
@@ -376,7 +419,7 @@ class SearchRecommendationWindow(QWidget):
         self.tableWidget.show()  # Show the table widget when switching
         self.tableWidget.setRowCount(0)  # Clear table when switching to Search
         self.stacked_widget.setCurrentWidget(self.search_ui)
-        self.stacked_widget.setFixedHeight(160)
+        self.stacked_widget.setFixedHeight(200)
 
     def show_recommend_ui(self):
         self.tableWidget.show()
