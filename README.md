@@ -1,6 +1,8 @@
 # Film Recommendation
 
-A desktop movie recommendation application built with Python and PyQt6. The project combines data processing, a local database, and model-based recommenders to provide personalized film suggestions.
+A desktop movie recommendation application built with Python and PyQt6. 
+The project combines data processing, a local database, 
+and model-based recommenders to provide film suggestions.
 
 ## Key features
 - Desktop GUI built with `PyQt6` (`ui/windows`).
