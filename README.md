@@ -4,7 +4,19 @@ A desktop movie recommendation application built with Python and PyQt6.
 The project combines data processing, a local database, 
 and model-based recommenders to provide film suggestions.
 
-## Key features
+## Table of Contents
+
+- [Key Features](#key-features)
+- [Requirements](#requirements)
+- [Running the application](#running-the-application)
+- [Project structure (high level)](#project-structure-high-level)
+- [Database](#database)
+- [Development notes](#development-notes)
+- [Additional information about the project](#additional-information-about-the-project)
+- [Plans for improvements](#plans-for-improvements)
+
+
+## Key Features
 - Desktop GUI built with `PyQt6` (`ui/windows`).
 - Data ingestion and cleaning utilities in `data/` and `data_clearing/`.
 - Local database management and utilities in `database/`.
